@@ -1,32 +1,74 @@
-# Prerequisites
-*.d
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+int ledPin = A5;
+int GPin = A3;
+int pushButton = D2;
+int buttonValue;
+class Robot {
 
-# Precompiled Headers
-*.gch
-*.pch
+  public:
+   volatile bool robotrun = TRUE;
+    Robot() {
+      pinMode(ledPin, OUTPUT);
+      pinMode(GPin, OUTPUT);
+      pinMode(D2, INPUT_PULLUP);
+      attachInterrupt(D2, &Robot::handler, this, CHANGE);
+      
+    }
+    void handler() { 
+        robotrun = !robotrun;
+            if(robotrun == TRUE){
+                System.reset(); 
+            }
+           
+    }
+    void change(){
+        robotrun =!robotrun;
+    }
+    
+        
+};
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+class Read{
+    public:
+    volatile bool run = FALSE;
+    Read() {
+        pinMode(ledPin, OUTPUT);
+        pinMode(GPin, OUTPUT);
+        pinMode(D2, INPUT_PULLUP);
+        attachInterrupt(D2, &Read::handler, this, CHANGE);
+    }
+    void handler() {
+        run = TRUE;
+    }
+    
+    void read(){
+        run = FALSE;
+        delay(1000);
+        Robot myRobot;// My robot in here will use the push button again to reset the program
+        digitalWrite(ledPin, HIGH); // Need to change for the morse code.
+        myRobot.change();// this function changes the bool in Myrobot to ensure it does not reset the argon.
+        delay(2000);
+      
+       
+    }
+};
 
-# Fortran module files
-*.mod
-*.smod
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
 
-# Executables
-*.exe
-*.out
-*.app
+void setup()
+{
+}
+
+
+
+void loop()
+{
+    //The first time the push button is activated, the Read class is generated.
+    Read myread;
+    if(myread.run == TRUE)
+    {
+        myread.read();
+        digitalWrite(ledPin, LOW);
+    }
+ 
+}
